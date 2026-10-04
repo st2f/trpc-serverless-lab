@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+:root {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  background: #fafafa;
+  color: #18181b;
+  font-synthesis: none;
+}
+
+[data-theme="day"] {
+  color-scheme: light;
+  --page: #fafafa;
+  --ink: #18181b;
+  --muted: #52525b;
+  --line: #e4e4e7;
+  --card: #ffffff;
+  --accent: #059669;
+}
+
+[data-theme="night"] {
+  color-scheme: dark;
+  --page: #171e2d;
+  --ink: #fafafa;
+  --muted: #a4aec0;
+  --line: #354055;
+  --card: #20293a;
+  --accent: #34d399;
+}
+
+button { cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0s !important; }
+}

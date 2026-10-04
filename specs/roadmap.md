@@ -15,7 +15,7 @@ MiniStack compatibility is the first decision gate, before building the applicat
 - [x] Confirm that the integration can be provisioned with Terraform and recreated from documented commands.
 - [x] Record the versions tested and any relevant limitations.
 
-**Completed and rechecked with Node 24 on 2026-10-04:** see the [verification record](./ministack-verification.md) and [reproduction commands](../README.md). The topology checks passed, including clean teardown and recreation. The configured `nodejs24.x` runtime and actual Node 24.18.1 execution now match in major version; full AWS runtime parity remains outside the local probe's scope.
+**Completed and rechecked with Node 24 on 2026-10-04:** The topology checks passed, including clean teardown and recreation. The configured `nodejs24.x` runtime and actual Node 24.18.1 execution now match in major version; full AWS runtime parity remains outside the local probe's scope.
 
 **Completion criteria:** a local HTTP request reaches a real emulated Node.js Lambda invocation through API Gateway, and its response reaches the caller. Direct Lambda invocation alone is insufficient.
 
@@ -94,13 +94,15 @@ Instantiate the router and handler at module scope. Lambda can reuse an executio
 
 ## 7. Build the React interface
 
-- [ ] Set up React and TailwindCSS in `frontend/`.
-- [ ] Configure a typed tRPC client using the exported router type and an environment-configured API URL.
-- [ ] Choose a query integration and document its basic fetch, cache, and refetch behavior. If using a query library, keep its configuration minimal.
-- [ ] Display three quotes with loading and error states.
-- [ ] Add a day/night control that supplies the theme to `quotes.get` and updates the page appearance.
-- [ ] Make Refresh refetch the current query; no mutation is needed because there is no persistent state change.
-- [ ] Check that changing themes displays the matching collection and that repeated refreshes remain usable.
+- [x] Set up React and TailwindCSS in `frontend/`.
+- [x] Configure a typed tRPC client using the exported router type and an environment-configured API URL.
+- [x] Choose a query integration and document its basic fetch, cache, and refetch behavior. If using a query library, keep its configuration minimal.
+- [x] Display three quotes with loading and error states.
+- [x] Add a day/night control that supplies the theme to `quotes.get` and updates the page appearance.
+- [x] Make Refresh refetch the current query; no mutation is needed because there is no persistent state change.
+- [x] Check that changing themes displays the matching collection and that repeated refreshes remain usable.
+
+**Completed 2026-10-04:** React, Vite, and TailwindCSS provide a responsive day/night interface with a typed tRPC client and an environment-configured API URL. TanStack Query caches each theme separately and refetches stale data when switching themes; Refresh refetches the current query. Both workspaces pass strict type checking and build successfully. All 33 offline tests and six live HTTP checks passed. Chromium exercised the complete browser → MiniStack → Lambda path, covering initial loading, matching collections, cached-theme refetch, repeated refreshes, simulated request failure and recovery, and mobile layout with no runtime errors.
 
 The query input should distinguish the two themes in the client cache. Decide explicitly whether theme changes may display cached quotes or should fetch fresh ones; either behavior is acceptable if the UI is consistent.
 

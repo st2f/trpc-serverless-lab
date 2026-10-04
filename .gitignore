@@ -7,3 +7,5 @@ node_modules/
 dist/
 .vitest/
 coverage/
+.env.local
+.env.*.local

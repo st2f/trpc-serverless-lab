@@ -5,5 +5,30 @@
   "type": "module",
   "engines": {
     "node": ">=24 <25"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.104.1",
+    "@trpc/client": "^11.19.0",
+    "@trpc/tanstack-react-query": "^11.19.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@trpc-lab/backend": "^0.0.0",
+    "@types/node": "^24.19.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2",
+    "@trpc/server": "11.19.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview"
   }
 }

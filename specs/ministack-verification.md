@@ -50,8 +50,6 @@ The Compose image is pinned by digest, and Terraform provider selections are rec
 - Terraform destroyed all seven resources, the container was removed and recreated, and a fresh apply recreated all seven resources. The direct, GET, and POST checks passed again.
 - Step 2 rechecked direct, GET, and POST invocation after deploying the TypeScript-built ESM `index.mjs` artifact. All checks passed under Node 24.18.1, and Terraform reported no drift after a reproducible rebuild.
 
-The executable checks are in [scripts/verify-ministack.mjs](../scripts/verify-ministack.mjs). Reproduction and teardown commands are in the [README](../README.md).
-
 ## Limitations and follow-up
 
 1. **Matching Node major versions do not establish full runtime parity.** The configured runtime is `nodejs24.x` and the local executor used Node 24.18.1. MiniStack runs its own container's Node binary rather than the AWS managed runtime, so operating system, patch version, bundled libraries, and execution environment can still differ. AWS deployment checks remain necessary. No executor modification or workaround was added.
