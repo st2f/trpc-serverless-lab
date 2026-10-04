@@ -80,13 +80,15 @@ Instantiate the router and handler at module scope. Lambda can reuse an executio
 
 ## 6. Provision and exercise the local backend
 
-- [ ] Extend the verified Terraform setup to deploy the quote Lambda artifact and its API Gateway integration.
-- [ ] Configure routes to forward the tRPC procedure path to the handler.
-- [ ] Configure CORS for the local frontend origin, including preflight requests where required by the client transport.
-- [ ] Make the API URL available as a Terraform output.
-- [ ] Send a tRPC HTTP request through MiniStack API Gateway and verify the returned quote data.
-- [ ] Confirm how to inspect Lambda logs and how to rebuild and redeploy after a backend change.
-- [ ] Document local startup, provisioning, invocation, and teardown commands.
+- [x] Extend the verified Terraform setup to deploy the quote Lambda artifact and its API Gateway integration.
+- [x] Configure routes to forward the tRPC procedure path to the handler.
+- [x] Configure CORS for the local frontend origin, including preflight requests where required by the client transport.
+- [x] Make the API URL available as a Terraform output.
+- [x] Send a tRPC HTTP request through MiniStack API Gateway and verify the returned quote data.
+- [x] Confirm how to inspect Lambda logs and how to rebuild and redeploy after a backend change.
+- [x] Document local startup, provisioning, invocation, and teardown commands.
+
+**Completed 2026-10-04:** the user applied the reviewed Terraform configuration: four resources added, two updated, none destroyed. The Node 24 tRPC API runtime shares the HTTP API with the `/probe` handler. All six live HTTP checks passed, covering both themes and refetches, invalid input, unknown procedures, CORS preflight, and an unconfigured origin. MiniStack container logs confirmed the `trpc-lab-api` Node 24 worker started. Rebuild, deployment, log inspection, and teardown commands are documented in the README.
 
 **Completion criteria:** the packaged quote backend works through the full local API Gateway → Lambda → adapter → router → quote-selection path. Its lifecycle is reproducible from the README.
 

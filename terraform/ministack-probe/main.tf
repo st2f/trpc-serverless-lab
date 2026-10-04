@@ -50,8 +50,14 @@ resource "aws_lambda_function" "probe" {
 }
 
 resource "aws_apigatewayv2_api" "probe" {
-  name          = "trpc-lab-ministack-probe"
+  name          = "trpc-lab-local"
   protocol_type = "HTTP"
+
+  cors_configuration {
+    allow_origins = [var.frontend_origin]
+    allow_methods = ["GET", "POST", "OPTIONS"]
+    allow_headers = ["content-type"]
+  }
 }
 
 resource "aws_apigatewayv2_integration" "probe" {
@@ -64,7 +70,7 @@ resource "aws_apigatewayv2_integration" "probe" {
 
 resource "aws_apigatewayv2_route" "probe" {
   api_id    = aws_apigatewayv2_api.probe.id
-  route_key = "ANY /{proxy+}"
+  route_key = "ANY /probe"
   target    = "integrations/${aws_apigatewayv2_integration.probe.id}"
 }
 
@@ -80,7 +86,12 @@ resource "aws_apigatewayv2_stage" "probe" {
   api_id      = aws_apigatewayv2_api.probe.id
   name        = "$default"
   auto_deploy = true
-  depends_on  = [aws_apigatewayv2_route.probe, aws_lambda_permission.gateway]
+  depends_on = [
+    aws_apigatewayv2_route.probe,
+    aws_apigatewayv2_route.api,
+    aws_lambda_permission.gateway,
+    aws_lambda_permission.api,
+  ]
 }
 
 output "probe_url" {

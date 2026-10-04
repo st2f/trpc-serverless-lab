@@ -15,7 +15,7 @@ This establishes topology and basic request/response compatibility. It does not 
 - **Node.js 24:** `nodejs24.x` is a supported [AWS Lambda runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html) and is recognized by the pinned MiniStack implementation. It matches the major version of both the host Node.js and MiniStack's executor.
 - **Local Terraform root:** dummy credentials and explicit IAM, Lambda, API Gateway v1/v2, and STS endpoint overrides. Provider support and endpoint configuration are described in the [MiniStack IaC documentation](https://www.ministack.org/docs/iac).
 
-The initial step 1 handler was plain JavaScript. Step 2 moved it to `backend/src/entrypoints/probe.ts` and packaged its ESM `index.mjs` in `backend/dist/probe.zip`. Step 5 builds this probe from `dist/probe.mjs` and builds the separate tRPC application artifact as `dist/lambda.zip`. Each ZIP still contains `index.mjs`. The compatibility Terraform setup continues to deploy `probe.zip`; application deployment is step 6.
+The initial step 1 handler was plain JavaScript. Step 2 moved it to `backend/src/entrypoints/probe.ts` and packaged its ESM `index.mjs` in `backend/dist/probe.zip`. Step 5 builds this probe from `dist/probe.mjs` and builds the separate tRPC application artifact as `dist/lambda.zip`. Each ZIP still contains `index.mjs`. Step 6 deploys both ZIPs; the user applied the configuration and all six live application HTTP checks passed.
 
 ## Tested versions
 
@@ -56,7 +56,7 @@ The executable checks are in [scripts/verify-ministack.mjs](../scripts/verify-mi
 
 1. **Matching Node major versions do not establish full runtime parity.** The configured runtime is `nodejs24.x` and the local executor used Node 24.18.1. MiniStack runs its own container's Node binary rather than the AWS managed runtime, so operating system, patch version, bundled libraries, and execution environment can still differ. AWS deployment checks remain necessary. No executor modification or workaround was added.
 2. **Emulation is not an AWS environment.** This probe does not verify IAM enforcement, AWS isolation, cold-start timings, or CloudWatch log delivery. It uses container logs to inspect local execution.
-3. **Application transport remains untested.** The probe validates basic HTTP API event fields and response handling. Later steps must verify the actual tRPC adapter, procedure paths, batching if selected, errors, and browser CORS.
+3. **Application transport is verified locally.** Step 6 passed six live HTTP checks for both themes, repeated queries, invalid input, unknown procedures, and CORS. MiniStack logs confirmed the Node 24 worker started for `trpc-lab-api`. Browser behavior remains step 7; batching, if selected, would need separate verification.
 4. **Local state is ephemeral.** Removing the container discards resources; destroy with Terraform first. Terraform state remains local and separate from any future AWS configuration.
 
 The [MiniStack Lambda service page](https://www.ministack.org/docs/services/lambda) and repository describe execution modes with different levels of detail. The runtime version and behavior above are observed results from the pinned image, rather than assumptions based only on advertised support.

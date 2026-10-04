@@ -13,6 +13,7 @@
     "typecheck": "npm run typecheck --workspace @trpc-lab/backend",
     "test": "npm run test --workspace @trpc-lab/backend -- --reporter=tree",
     "test:watch": "npm run test:watch --workspace @trpc-lab/backend",
+    "test:integration": "npm run test:integration --workspace @trpc-lab/backend -- --reporter=tree",
     "build": "npm run build --workspace @trpc-lab/backend",
     "verify:ministack": "node scripts/verify-ministack.mjs"
   }
