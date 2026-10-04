@@ -1,5 +1,10 @@
-// Compatibility probe only; the application handler is introduced in step 5.
-exports.handler = async (event, context) => {
+import type { APIGatewayProxyResult, Context } from "aws-lambda";
+
+// Compatibility probe only; the tRPC application handler is introduced in step 5.
+export async function handler(
+  event: unknown,
+  context: Pick<Context, "awsRequestId">,
+): Promise<APIGatewayProxyResult> {
   console.log(JSON.stringify({ message: "MiniStack Node.js probe", requestId: context.awsRequestId }));
 
   return {
@@ -13,4 +18,4 @@ exports.handler = async (event, context) => {
       event,
     }),
   };
-};
+}

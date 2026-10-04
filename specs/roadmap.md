@@ -23,12 +23,14 @@ MiniStack compatibility is the first decision gate, before building the applicat
 
 ## 2. Establish a minimal TypeScript project
 
-- [ ] Set up `backend/`, `frontend/`, and `terraform/` with a small, documented package arrangement.
-- [ ] Select a Node.js version supported by the intended Lambda runtime and use it consistently for local development and builds.
-- [ ] Enable strict TypeScript checking and configure Vitest for backend tests.
-- [ ] Add scripts for type checking, testing, and building the Lambda artifact.
-- [ ] Keep the frontend and backend dependency boundaries visible. The frontend will import the router's type only, without bundling backend implementation code.
-- [ ] Document the development commands and prerequisites in the README.
+- [x] Set up `backend/`, `frontend/`, and `terraform/` with a small, documented package arrangement.
+- [x] Select a Node.js version supported by the intended Lambda runtime and use it consistently for local development and builds.
+- [x] Enable strict TypeScript checking and configure Vitest for backend tests.
+- [x] Add scripts for type checking, testing, and building the Lambda artifact.
+- [x] Keep the frontend and backend dependency boundaries visible. The frontend will import the router's type only, without bundling backend implementation code.
+- [x] Document the development commands and prerequisites in the README.
+
+**Completed 2026-10-04:** npm workspaces, Node 24 configuration, strict TypeScript, Vitest, and an ESM-only backend build are in place. The existing probe is now TypeScript and builds to `backend/dist/index.mjs` plus a Lambda ZIP consumed by Terraform. Type checking, the minimal test, native ESM import, and deployed MiniStack invocation checks passed. A clean install reproduced the same ZIP, and Terraform reported no drift. The frontend is reserved for step 7; the router's type-only package export will be added with the router in step 4.
 
 Prefer a straightforward repository setup; introduce workspace tooling only if it makes sharing types and running commands clearer.
 

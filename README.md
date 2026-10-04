@@ -2,19 +2,65 @@
 
 A small learning project for tRPC on API Gateway and AWS Lambda. See the [plan](specs/plan.md) and [roadmap](specs/roadmap.md).
 
+## Development setup
+
+Use Node.js 24 throughout development, builds, and Lambda configuration. `.nvmrc` selects that major version; package engines and `.npmrc` reject installing dependencies with another Node major version.
+
+```sh
+nvm use
+npm ci
+npm run typecheck
+npm test
+npm run build
+```
+
+`nvm use` is optional if Node 24 is already selected through another version manager. Run `npm run test:watch` for watch mode. The lockfile records the installed dependencies so `npm ci` reproduces them.
+
+The repository has two npm workspaces sharing one lockfile:
+
+```text
+backend/
+  src/entrypoints/probe.ts       # Current compatibility handler
+  src/entrypoints/probe.test.ts  # Minimal Vitest test
+  scripts/build.mjs             # ESM bundle and ZIP packaging
+  dist/index.mjs                # Generated ESM handler
+  dist/probe.zip                # Generated Lambda artifact
+frontend/                       # Reserved for React in step 7
+terraform/ministack-probe/       # Local infrastructure only
+scripts/verify-ministack.mjs     # HTTP and Lambda integration checks
+```
+
+Backend commands are available at the root and in the backend workspace. The frontend currently has no application code; root type checking covers the backend source, its test, and Vitest configuration.
+
+### ESM and TypeScript choices
+
+All project packages use `"type": "module"`, scripts use `.mjs`, and the Lambda ZIP contains `index.mjs`. The handler setting stays `index.handler`: Lambda resolves the module and calls its named `handler` export.
+
+The shared TypeScript configuration enables strict checking, unchecked-index checks, and exact optional-property types. Backend `NodeNext` resolution follows Node's ESM rules. Relative TypeScript imports use the eventual JavaScript extension, such as `import { handler } from "./probe.js"`; TypeScript and Vitest resolve it to the source `.ts` file.
+
+`verbatimModuleSyntax` preserves ordinary imports and erases explicit `import type` declarations. It also prevents silently translating ESM imports into CommonJS. See the [TypeScript documentation](https://www.typescriptlang.org/tsconfig/verbatimModuleSyntax.html).
+
+TypeScript checks types without emitting files. esbuild bundles the entry point with `format: "esm"` and `target: "node24"`; the build then packages it in a ZIP. The build runs type checking first because esbuild transpilation does not check types. See the [esbuild API](https://esbuild.github.io/api/).
+
+### Frontend/backend boundary
+
+Each workspace owns its dependencies. The backend currently exposes no package exports. In step 4, add a dedicated type-only export for the router's `AppRouter` type; the frontend will use `import type` from that entry. Backend handlers and quote-selection implementations remain outside the frontend's runtime imports. The frontend will extend the shared strict configuration with browser and bundler settings when its build tool is added.
+
 ## Step 1: MiniStack compatibility probe
 
-The probe packages a JavaScript handler and uses Terraform to provision an IAM role, Node.js Lambda, HTTP API, proxy integration, route, invocation permission, and default stage in MiniStack.
+The backend build packages the TypeScript probe as an ESM JavaScript handler. Terraform provisions an IAM role, Node.js Lambda, HTTP API, proxy integration, route, invocation permission, and default stage in MiniStack.
 
 ```text
 HTTP GET / POST → MiniStack API Gateway → MiniStack Lambda → index.handler
 ```
 
-Prerequisites: Docker with Compose and a running daemon, Terraform >= 1.5 and < 2, Node.js 24, AWS CLI v2, and an available local port 4566. Initial setup downloads the pinned MiniStack image and Terraform providers. No AWS account credentials are needed.
+Prerequisites: Node.js 24 and npm, Docker with Compose and a running daemon, Terraform >= 1.5 and < 2, AWS CLI v2, and an available local port 4566. Initial setup downloads npm dependencies, the pinned MiniStack image, and Terraform providers. No AWS account credentials are needed.
 
 Run from the repository root:
 
 ```sh
+npm ci
+npm run build
 docker compose up -d --wait
 terraform -chdir=terraform/ministack-probe init
 terraform -chdir=terraform/ministack-probe apply
@@ -38,7 +84,7 @@ terraform -chdir=terraform/ministack-probe plan
 docker compose logs ministack
 ```
 
-After changing the handler, rerun Terraform apply and the verifier. Terraform rebuilds the ZIP and detects code changes through its hash. Keep `.terraform.lock.hcl` in version control; generated ZIPs, provider downloads, and local state are ignored.
+After changing the handler, rerun `npm run build`, Terraform apply, and the verifier. Terraform consumes `backend/dist/probe.zip` and detects code changes through its hash. ZIP timestamps are fixed so unchanged builds keep the same hash. Keep the npm and Terraform lockfiles in version control; build output, installed dependencies, provider downloads, and local state are ignored.
 
 Teardown, in this order:
 

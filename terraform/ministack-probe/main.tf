@@ -6,10 +6,6 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.0"
     }
-    archive = {
-      source  = "hashicorp/archive"
-      version = "~> 2.0"
-    }
   }
 }
 
@@ -31,12 +27,6 @@ provider "aws" {
   }
 }
 
-data "archive_file" "probe" {
-  type        = "zip"
-  source_file = "${path.module}/index.js"
-  output_path = "${path.module}/probe.zip"
-}
-
 resource "aws_iam_role" "probe" {
   name = "trpc-lab-ministack-probe"
   assume_role_policy = jsonencode({
@@ -54,8 +44,8 @@ resource "aws_lambda_function" "probe" {
   role             = aws_iam_role.probe.arn
   runtime          = "nodejs24.x"
   handler          = "index.handler"
-  filename         = data.archive_file.probe.output_path
-  source_code_hash = data.archive_file.probe.output_base64sha256
+  filename         = "${path.module}/../../backend/dist/probe.zip"
+  source_code_hash = filebase64sha256("${path.module}/../../backend/dist/probe.zip")
   timeout          = 10
 }
 

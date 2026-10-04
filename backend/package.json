@@ -1,0 +1,24 @@
+{
+  "name": "@trpc-lab/backend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {},
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "npm run typecheck && node scripts/build.mjs"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.164",
+    "@types/node": "^24.19.1",
+    "esbuild": "^0.28.2",
+    "fflate": "^0.8.3",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  }
+}

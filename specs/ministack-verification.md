@@ -15,7 +15,7 @@ This establishes topology and basic request/response compatibility. It does not 
 - **Node.js 24:** `nodejs24.x` is a supported [AWS Lambda runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html) and is recognized by the pinned MiniStack implementation. It matches the major version of both the host Node.js and MiniStack's executor.
 - **Local Terraform root:** dummy credentials and explicit IAM, Lambda, API Gateway v1/v2, and STS endpoint overrides. Provider support and endpoint configuration are described in the [MiniStack IaC documentation](https://www.ministack.org/docs/iac).
 
-The handler is intentionally plain JavaScript for this compatibility experiment. TypeScript tooling and the application structure belong to step 2.
+The initial step 1 handler was plain JavaScript. Step 2 moves it to `backend/src/entrypoints/probe.ts`, builds an ESM `index.mjs`, and packages it in `backend/dist/probe.zip`. Terraform now deploys that artifact; the tRPC application handler still belongs to step 5.
 
 ## Tested versions
 
@@ -29,7 +29,7 @@ Rechecked with `nodejs24.x` on 2026-10-04, macOS ARM64 with Docker using Colima.
 | Docker Compose | 5.0.1 |
 | Terraform | 1.15.8 |
 | Terraform AWS provider | 6.67.0 |
-| Terraform archive provider | 2.8.1 |
+| Terraform archive provider, initial step 1 only | 2.8.1; replaced by backend ZIP packaging in step 2 |
 | Host Node.js, used by verifier | 24.7.0 |
 | Configured Lambda runtime | `nodejs24.x` |
 | Actual Lambda executor Node.js | 24.18.1 |
@@ -48,6 +48,7 @@ The Compose image is pinned by digest, and Terraform provider selections are rec
 - Direct and HTTP responses passed assertions that the executing runtime is Node 24; HTTP responses also included a Lambda request ID.
 - A subsequent Terraform plan reported no changes.
 - Terraform destroyed all seven resources, the container was removed and recreated, and a fresh apply recreated all seven resources. The direct, GET, and POST checks passed again.
+- Step 2 rechecked direct, GET, and POST invocation after deploying the TypeScript-built ESM `index.mjs` artifact. All checks passed under Node 24.18.1, and Terraform reported no drift after a reproducible rebuild.
 
 The executable checks are in [scripts/verify-ministack.mjs](../scripts/verify-ministack.mjs). Reproduction and teardown commands are in the [README](../README.md).
 
