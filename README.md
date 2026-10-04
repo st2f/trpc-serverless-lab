@@ -46,6 +46,16 @@ TypeScript checks types without emitting files. esbuild bundles the entry point 
 
 Each workspace owns its dependencies. The backend currently exposes no package exports. In step 4, add a dedicated type-only export for the router's `AppRouter` type; the frontend will use `import type` from that entry. Backend handlers and quote-selection implementations remain outside the frontend's runtime imports. The frontend will extend the shared strict configuration with browser and bundler settings when its build tool is added.
 
+## Quote selection
+
+`backend/src/quotes/` contains the independent application logic. `Quote` has an `id` and `text`; `Theme` is `"day" | "night"`. Each theme has five original sample quotes stored in code.
+
+`selectQuotes(theme)` returns three distinct quotes by randomly selecting and removing entries from a copy of the requested collection. The source collection remains intact. TypeScript's `readonly` declarations prevent accidental writes during development; copying the array preserves its contents at runtime.
+
+An optional second argument supplies a random function returning a number in `[0, 1)`. Tests use controlled values to check selection boundaries and different results without relying on chance. Repeated calls may return the same selection. Run `npm test` to check the quote behavior without starting MiniStack.
+
+This function will be connected to `quotes.get` in roadmap step 4. The deployed Lambda currently remains the compatibility probe.
+
 ## Step 1: MiniStack compatibility probe
 
 The backend build packages the TypeScript probe as an ESM JavaScript handler. Terraform provisions an IAM role, Node.js Lambda, HTTP API, proxy integration, route, invocation permission, and default stage in MiniStack.

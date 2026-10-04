@@ -38,11 +38,13 @@ Prefer a straightforward repository setup; introduce workspace tooling only if i
 
 ## 3. Implement quote selection independently
 
-- [ ] Define the quote shape and the `day | night` theme type.
-- [ ] Add in-code collections with at least three distinct quotes per theme.
-- [ ] Implement a function that selects three distinct quotes from the requested collection without modifying it.
-- [ ] Keep this function independent of tRPC, HTTP, Lambda, and AWS.
-- [ ] Test the result count, uniqueness, theme membership, and preservation of the original collection.
+- [x] Define the quote shape and the `day | night` theme type.
+- [x] Add in-code collections with at least three distinct quotes per theme.
+- [x] Implement a function that selects three distinct quotes from the requested collection without modifying it.
+- [x] Keep this function independent of tRPC, HTTP, Lambda, and AWS.
+- [x] Test the result count, uniqueness, theme membership, and preservation of the original collection.
+
+**Completed 2026-10-04:** `backend/src/quotes/` defines the quote types, five original sample quotes per theme, and `selectQuotes()`. Selection samples from a copy without replacement and accepts an optional random source for deterministic checks. Strict type checking and all 14 backend tests passed, including result invariants, collection preservation, different selections, and invalid random-source values. The tRPC procedure will call this function in step 4.
 
 Random results can repeat across requests; refreshing does not need to guarantee a different selection. Avoid tests that depend on a particular random result. If deterministic sampling tests are useful, allow a controlled random source in the selection function.
 
