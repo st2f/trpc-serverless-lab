@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
-import { quoteCollections } from "./collections.js";
-import { selectQuotes } from "./select.js";
-import type { Theme } from "./types.js";
+import { quoteCollections } from "../../src/quotes/collections.js";
+import { selectQuotes } from "../../src/quotes/select.js";
+import type { Theme } from "../../src/quotes/types.js";
 
 const themes: Theme[] = ["day", "night"];
 

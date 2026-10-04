@@ -66,11 +66,13 @@ Direct caller tests exercise procedure behavior without HTTP. They do not establ
 
 ## 5. Add the Lambda entry point and build artifact
 
-- [ ] Create `backend/entrypoints/lambda.ts` using `awsLambdaRequestHandler()` from `@trpc/server/adapters/aws-lambda`.
-- [ ] Keep the handler thin: connect the router and any necessary request context, with quote logic staying in its own module.
-- [ ] Build a deployment artifact whose module format, handler export, and dependencies match the chosen Node.js Lambda runtime.
-- [ ] Test the adapter with representative API Gateway events for the payload version chosen in stage 1.
-- [ ] Verify a valid query and an invalid request, including response status and body.
+- [x] Create `backend/src/entrypoints/lambda.ts` using `awsLambdaRequestHandler()` from `@trpc/server/adapters/aws-lambda`.
+- [x] Keep the handler thin: connect the router and any necessary request context, with quote logic staying in its own module.
+- [x] Build a deployment artifact whose module format, handler export, and dependencies match the chosen Node.js Lambda runtime.
+- [x] Test the adapter with representative API Gateway events for the payload version chosen in stage 1.
+- [x] Verify a valid query and an invalid request, including response status and body.
+
+**Completed 2026-10-04:** the module-scope Lambda adapter uses HTTP API v2 event types and builds to a self-contained ESM `backend/dist/lambda.zip` for Node 24. The compatibility probe retains its separate ZIP for the existing Terraform setup. All tests and fixtures are under `backend/tests/`. Strict type checking and all 33 tests passed through Vitest, including valid-theme, invalid-input, malformed-JSON, and unknown-procedure adapter responses. The artifact suite builds a fresh ZIP and invokes its extracted ESM handler outside the repository in native Node. Application deployment through MiniStack remains step 6.
 
 Instantiate the router and handler at module scope. Lambda can reuse an execution environment across requests, but application correctness must not depend on that reuse.
 

@@ -1,0 +1,30 @@
+{
+  "version": "2.0",
+  "routeKey": "ANY /{proxy+}",
+  "rawPath": "/quotes.get",
+  "rawQueryString": "",
+  "headers": {
+    "host": "test-api.execute-api.us-east-1.amazonaws.com",
+    "accept": "application/json"
+  },
+  "requestContext": {
+    "accountId": "000000000000",
+    "apiId": "test-api",
+    "domainName": "test-api.execute-api.us-east-1.amazonaws.com",
+    "domainPrefix": "test-api",
+    "http": {
+      "method": "GET",
+      "path": "/quotes.get",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "127.0.0.1",
+      "userAgent": "lambda-adapter-test"
+    },
+    "requestId": "gateway-test-request",
+    "routeKey": "ANY /{proxy+}",
+    "stage": "$default",
+    "time": "04/Oct/2026:12:00:00 +0000",
+    "timeEpoch": 1791115200000
+  },
+  "pathParameters": { "proxy": "quotes.get" },
+  "isBase64Encoded": false
+}

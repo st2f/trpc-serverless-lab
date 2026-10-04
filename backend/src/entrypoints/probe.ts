@@ -1,6 +1,6 @@
 import type { APIGatewayProxyResult, Context } from "aws-lambda";
 
-// Compatibility probe only; the tRPC application handler is introduced in step 5.
+// Compatibility probe retained for the original MiniStack verification workflow.
 export async function handler(
   event: unknown,
   context: Pick<Context, "awsRequestId">,

@@ -1,9 +1,9 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import type { AppRouter } from "@trpc-lab/backend/types";
 import { expect, expectTypeOf, test } from "vitest";
-import { quoteCollections } from "../quotes/collections.js";
-import type { Theme } from "../quotes/types.js";
-import { appRouter } from "./router.js";
+import { quoteCollections } from "../../src/quotes/collections.js";
+import type { Theme } from "../../src/quotes/types.js";
+import { appRouter } from "../../src/trpc/router.js";
 
 const themes: Theme[] = ["day", "night"];
 

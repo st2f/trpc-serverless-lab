@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { handler } from "./probe.js";
+import { handler } from "../../src/entrypoints/probe.js";
 
 test("preserves request data inside a JSON Lambda proxy response", async () => {
   const event = { message: 'Quotes: "hello"\nBonjour 🌙', values: [1, null, true] };

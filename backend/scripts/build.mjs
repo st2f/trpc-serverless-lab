@@ -10,8 +10,12 @@ await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
 await build({
   absWorkingDir: backendRoot,
-  entryPoints: ["src/entrypoints/probe.ts"],
-  outfile: fileURLToPath(new URL("index.mjs", dist)),
+  entryPoints: {
+    index: "src/entrypoints/lambda.ts",
+    probe: "src/entrypoints/probe.ts",
+  },
+  outdir: fileURLToPath(dist),
+  outExtension: { ".js": ".mjs" },
   bundle: true,
   platform: "node",
   target: "node24",
@@ -19,8 +23,10 @@ await build({
   tsconfig: "tsconfig.json",
 });
 
-const handler = await readFile(new URL("index.mjs", dist));
 // A fixed ZIP timestamp keeps identical builds from changing Terraform's code hash.
-const archive = zipSync({ "index.mjs": handler }, { mtime: new Date("2000-01-01T00:00:00Z") });
-await writeFile(new URL("probe.zip", dist), archive);
-console.log("Built backend/dist/index.mjs and backend/dist/probe.zip (handler: index.handler)");
+for (const [moduleName, zipName] of [["index.mjs", "lambda.zip"], ["probe.mjs", "probe.zip"]]) {
+  const handler = await readFile(new URL(moduleName, dist));
+  const archive = zipSync({ "index.mjs": handler }, { mtime: new Date("2000-01-01T00:00:00Z") });
+  await writeFile(new URL(zipName, dist), archive);
+  console.log(`Built backend/dist/${moduleName} and backend/dist/${zipName} (handler: index.handler)`);
+}
