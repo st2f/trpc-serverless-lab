@@ -2,6 +2,8 @@ priv/
 .terraform/
 *.tfstate
 *.tfstate.*
+*.tfplan
+terraform/aws/account.tfvars
 terraform/ministack/probe.zip
 node_modules/
 dist/

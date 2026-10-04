@@ -11,8 +11,12 @@ let apiUrl: string;
 let frontendOrigin: string;
 
 beforeAll(() => {
+  const target = process.env.TRPC_LAB_TARGET ?? "ministack";
+  if (target !== "ministack" && target !== "aws") {
+    throw new Error("TRPC_LAB_TARGET must be ministack or aws.");
+  }
   const terraformRoot = fileURLToPath(
-    new URL("../../../terraform/ministack/", import.meta.url),
+    new URL(`../../../terraform/${target}/`, import.meta.url),
   );
   const outputs = JSON.parse(
     execFileSync("terraform", ["output", "-json"], {
@@ -22,7 +26,7 @@ beforeAll(() => {
   );
   if (!outputs.api_url?.value || !outputs.frontend_origin?.value) {
     throw new Error(
-      "Outputs are missing. Build and provision the local backend before running integration tests.",
+      `Outputs are missing. Build and provision the ${target} backend before running integration tests.`,
     );
   }
   apiUrl = outputs.api_url.value;
@@ -88,6 +92,7 @@ test("API Gateway answers the browser preflight", async () => {
     signal: AbortSignal.timeout(15_000),
   });
   expect([200, 204]).toContain(response.status);
+  expect(response.headers.get("x-lambda-request-id")).toBeNull();
   expect(response.headers.get("access-control-allow-origin")).toBe(
     frontendOrigin,
   );

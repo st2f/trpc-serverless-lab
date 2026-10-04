@@ -37,7 +37,7 @@ REQUEST_ID='<x-lambda-request-id from the response>'
 env -u AWS_PROFILE -u AWS_DEFAULT_PROFILE -u AWS_SESSION_TOKEN \
   AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 \
   aws --endpoint-url http://localhost:4566 logs filter-log-events \
-  --log-group-name /aws/lambda/trpc-lab-api --filter-pattern "$REQUEST_ID" \
+  --log-group-name /aws/lambda/trpc-lab-api --filter-pattern "\"$REQUEST_ID\"" \
   --query 'events[].message' --output text
 ```
 
@@ -71,4 +71,4 @@ Malformed JSON is rejected before procedure execution; an unknown path returns `
 
 Vite is a persistent local development server for HTML, JavaScript, CSS and hot reload. It hosts no backend routes. MiniStack owns the listener on port 4566 and emulates API Gateway and Lambda, invoking the uploaded handler in its local Node executor.
 
-In AWS, API Gateway accepts requests and Lambda manages Node execution environments. Our backend starts no listening HTTP server. The module-scope router and adapter may be reused across invocations, but each invocation gets its own request context and IDs. A production frontend build is static assets; hosting those assets is separate from the Lambda API. On AWS, console output goes to [CloudWatch Logs](https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html) when the execution role has the required logging permissions; that infrastructure remains step 9.
+In AWS, API Gateway accepts requests and Lambda manages Node execution environments. Our backend starts no listening HTTP server. The module-scope router and adapter may be reused across invocations, but each invocation gets its own request context and IDs. A production frontend build is static assets; hosting those assets is separate from the Lambda API. On AWS, console output goes to [CloudWatch Logs](https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html) when the execution role has the required logging permissions; see the [README](../README.md#real-aws).
