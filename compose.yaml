@@ -1,0 +1,15 @@
+name: trpc-serverless-lab
+
+services:
+  ministack:
+    image: ministackorg/ministack:1.5.20@sha256:051edcb3daed7ca3bdfe06c3c5e1427473ba656e8211f8c1d342543b277e982d
+    ports:
+      - "127.0.0.1:4566:4566"
+    environment:
+      LAMBDA_EXECUTOR: local
+      LOG_LEVEL: INFO
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4566/_ministack/health')"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
