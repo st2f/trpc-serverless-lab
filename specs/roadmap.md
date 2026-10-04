@@ -52,11 +52,13 @@ Random results can repeat across requests; refreshing does not need to guarantee
 
 ## 4. Expose the application through tRPC
 
-- [ ] Create the tRPC initialization and root router under `backend/trpc/`.
-- [ ] Add `quotes.get` as a query accepting `{ theme: "day" | "night" }`.
-- [ ] Validate input at runtime with a schema supported by tRPC. TypeScript types alone do not validate incoming HTTP data.
-- [ ] Call the quote-selection function from the procedure and export the router type for the frontend.
-- [ ] Test both valid themes and invalid input through a direct router caller.
+- [x] Create the tRPC initialization and root router under `backend/src/trpc/`.
+- [x] Add `quotes.get` as a query accepting `{ theme: "day" | "night" }`.
+- [x] Validate input at runtime with a schema supported by tRPC. TypeScript types alone do not validate incoming HTTP data.
+- [x] Call the quote-selection function from the procedure and export the router type for the frontend.
+- [x] Test both valid themes and invalid input through a direct router caller.
+
+**Completed 2026-10-04:** the ESM router validates input with Zod, calls `selectQuotes()`, and exposes `AppRouter` through `@trpc-lab/backend/types`. Both themes return three distinct quotes; seven invalid-input cases are rejected with `BAD_REQUEST`. Strict type checking and all 24 backend tests passed. The type-only export resolves during type checking and rejects runtime imports. HTTP and Lambda adapter checks remain in the next stages.
 
 Direct caller tests exercise procedure behavior without HTTP. They do not establish that the API Gateway or Lambda adapter integration works.
 

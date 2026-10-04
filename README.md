@@ -44,7 +44,13 @@ TypeScript checks types without emitting files. esbuild bundles the entry point 
 
 ### Frontend/backend boundary
 
-Each workspace owns its dependencies. The backend currently exposes no package exports. In step 4, add a dedicated type-only export for the router's `AppRouter` type; the frontend will use `import type` from that entry. Backend handlers and quote-selection implementations remain outside the frontend's runtime imports. The frontend will extend the shared strict configuration with browser and bundler settings when its build tool is added.
+Each workspace owns its dependencies. The backend exposes `AppRouter` through a type-only package entry:
+
+```ts
+import type { AppRouter } from "@trpc-lab/backend/types";
+```
+
+Its export map defines only the TypeScript `types` condition; there is no runtime entry for this path. The import is erased from browser output, keeping the router and quote-selection implementation out of the frontend bundle. The frontend will extend the shared strict configuration with browser and bundler settings when its build tool is added. This follows [tRPC's router type-sharing pattern](https://trpc.io/docs/server/routers).
 
 ## Quote selection
 
@@ -54,7 +60,17 @@ Each workspace owns its dependencies. The backend currently exposes no package e
 
 An optional second argument supplies a random function returning a number in `[0, 1)`. Tests use controlled values to check selection boundaries and different results without relying on chance. Repeated calls may return the same selection. Run `npm test` to check the quote behavior without starting MiniStack.
 
-This function will be connected to `quotes.get` in roadmap step 4. The deployed Lambda currently remains the compatibility probe.
+The tRPC `quotes.get` procedure calls this function. The deployed Lambda currently remains the compatibility probe; the tRPC adapter is added in step 5.
+
+## tRPC router
+
+`backend/src/trpc/init.ts` initializes tRPC once and exposes the router and public-procedure builders. `router.ts` defines the root router with a `quotes.get` query accepting `{ theme: "day" | "night" }` and returning three quotes.
+
+The input uses a Zod object schema with a theme enum. tRPC infers the procedure input type from the schema and validates actual incoming values at runtime. Missing themes, unsupported values, and malformed inputs are rejected with `BAD_REQUEST`. TypeScript alone cannot validate data arriving over HTTP. See [tRPC's validator documentation](https://trpc.io/docs/server/validators).
+
+The router tests use `appRouter.createCaller({})` to execute the procedure without HTTP or AWS. They verify both themes and malformed inputs. Invalid test inputs deliberately bypass the caller's static typing with `@ts-expect-error` so the runtime parser is exercised. Type assertions also verify the public `AppRouter` contract during `npm run typecheck`; Vitest's normal test run transpiles TypeScript without checking its types.
+
+Run `npm test` and `npm run typecheck` for these checks. The router is independent of the Lambda entry point, which will connect it to HTTP in the next stage.
 
 ## Step 1: MiniStack compatibility probe
 
