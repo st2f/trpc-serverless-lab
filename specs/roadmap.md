@@ -110,11 +110,13 @@ The query input should distinguish the two themes in the client cache. Decide ex
 
 ## 8. Make the request path observable
 
-- [ ] Write a short architecture note mapping each repository component to infrastructure, entry adapter, transport, or application logic.
-- [ ] Trace one browser request through the network panel, API Gateway integration, Lambda logs, and tRPC procedure.
-- [ ] Explain where input validation happens and how errors return to the client.
-- [ ] Record the difference between a local frontend development server and the production backend's invocation-based execution model.
-- [ ] Add a small HTTP integration check for the deployed local backend if needed to make the stage 6 checks repeatable.
+- [x] Write a short architecture note mapping each repository component to infrastructure, entry adapter, transport, or application logic.
+- [x] Trace one browser request through the network panel, API Gateway integration, Lambda logs, and tRPC procedure.
+- [x] Explain where input validation happens and how errors return to the client.
+- [x] Record the difference between a local frontend development server and the production backend's invocation-based execution model.
+- [x] Add a small HTTP integration check for the deployed local backend if needed to make the stage 6 checks repeatable.
+
+**Completed 2026-10-04:** [the request-path note](./request-path.md) maps the layers and explains tracing, validation, errors, and server ownership. After the user deployed the logging artifact, a Chromium Refresh response's `x-lambda-request-id` (`6c421a24-135b-4e34-9bde-2ccb6578ed6d`) matched both `trpc.procedure` (`quotes.get`, `OK`) and `lambda.response` (`GET`, 200) in MiniStack's emulated CloudWatch Logs. Local evidence is saved in ignored `priv/step8-browser-trace.json` and `priv/step8-runtime-logs.json`. Strict type checking, both builds, and 35 offline tests passed; all seven live HTTP checks passed, including distinct request IDs. The Terraform root was renamed to `terraform/ministack` with state preserved and references updated; the subsequent plan reported no changes and the probe verifier passed.
 
 **Completion criteria:** the execution path in the plan can be explained using a working request and evidence from the running system.
 

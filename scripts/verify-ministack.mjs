@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-const terraformRoot = fileURLToPath(new URL("../terraform/ministack-probe/", import.meta.url));
+const terraformRoot = fileURLToPath(new URL("../terraform/ministack/", import.meta.url));
 const outputs = JSON.parse(execFileSync("terraform", ["output", "-json"], {
   cwd: terraformRoot,
   encoding: "utf8",

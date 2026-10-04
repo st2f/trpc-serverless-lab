@@ -10,7 +10,7 @@ backend/src/trpc/            # router: quotes.get({ theme: "day" | "night" })
 backend/src/entrypoints/     # lambda.ts (tRPC handler), probe.ts (echo probe)
 backend/tests/               # Vitest suites
 frontend/                    # React + Tailwind + typed tRPC client
-terraform/ministack-probe/   # HTTP API + both Lambdas
+terraform/ministack/   # HTTP API + both Lambdas
 scripts/verify-ministack.mjs # probe checks
 ```
 
@@ -32,9 +32,9 @@ Also requires Docker, Terraform ≥ 1.5 and < 2, and AWS CLI v2. No AWS account 
 
 ```sh
 docker compose up -d --wait
-terraform -chdir=terraform/ministack-probe init
-terraform -chdir=terraform/ministack-probe plan    # review first
-terraform -chdir=terraform/ministack-probe apply
+terraform -chdir=terraform/ministack init
+terraform -chdir=terraform/ministack plan    # review first
+terraform -chdir=terraform/ministack apply
 npm run verify:ministack                           # probe checks
 npm run test:integration                           # HTTP checks against the deployed API
 ```
@@ -42,7 +42,7 @@ npm run test:integration                           # HTTP checks against the dep
 ## 3. Run the UI
 
 ```sh
-printf 'VITE_API_URL=%s\n' "$(terraform -chdir=terraform/ministack-probe output -raw api_url)" > frontend/.env.local
+printf 'VITE_API_URL=%s\n' "$(terraform -chdir=terraform/ministack output -raw api_url)" > frontend/.env.local
 npm run dev
 ```
 
@@ -58,7 +58,7 @@ Open http://localhost:5173. The browser calls MiniStack directly. Vite is pinned
 | `ANY /probe` | `trpc-lab-ministack-probe` | echoes the event and Node version |
 
 ```sh
-API=$(terraform -chdir=terraform/ministack-probe output -raw api_url)
+API=$(terraform -chdir=terraform/ministack output -raw api_url)
 curl --get "$API/quotes.get" --data-urlencode 'input={"theme":"day"}'   # or "night"
 curl "$API/probe"
 ```
@@ -71,18 +71,20 @@ CORS allows `http://localhost:5173`. For another origin, pass `-var='frontend_or
 
 ```sh
 npm run build
-terraform -chdir=terraform/ministack-probe plan
-terraform -chdir=terraform/ministack-probe apply
+terraform -chdir=terraform/ministack plan
+terraform -chdir=terraform/ministack apply
 npm run test:integration
 ```
 
 Frontend changes hot-reload in `npm run dev`.
 
-Logs: `docker compose logs -f ministack`.
+Emulator logs: `docker compose logs -f ministack`. Lambda request logs are in MiniStack's emulated CloudWatch Logs.
+
+To follow a browser request through API Gateway, Lambda logs, validation and the router, see [the request-path note](specs/request-path.md).
 
 ## Teardown
 
 ```sh
-terraform -chdir=terraform/ministack-probe destroy
+terraform -chdir=terraform/ministack destroy
 docker compose down
 ```

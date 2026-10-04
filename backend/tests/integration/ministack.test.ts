@@ -12,7 +12,7 @@ let frontendOrigin: string;
 
 beforeAll(() => {
   const terraformRoot = fileURLToPath(
-    new URL("../../../terraform/ministack-probe/", import.meta.url),
+    new URL("../../../terraform/ministack/", import.meta.url),
   );
   const outputs = JSON.parse(
     execFileSync("terraform", ["output", "-json"], {
@@ -123,4 +123,20 @@ test("unknown procedure paths reach tRPC and return NOT_FOUND", async () => {
   expect(response.status).toBe(404);
   const body = (await response.json()) as ErrorResponse;
   expect(body.error.data).toMatchObject({ code: "NOT_FOUND", httpStatus: 404 });
+});
+
+test("HTTP requests return distinct Lambda request IDs for log correlation", async () => {
+  const requestIds: string[] = [];
+  for (let request = 0; request < 2; request += 1) {
+    const response = await fetch(queryUrl("day"), {
+      headers: { origin: frontendOrigin },
+      signal: AbortSignal.timeout(15_000),
+    });
+    expect(response.status).toBe(200);
+    const requestId = response.headers.get("x-lambda-request-id");
+    expect(requestId).toBeTruthy();
+    if (requestId) requestIds.push(requestId);
+    await response.json();
+  }
+  expect(new Set(requestIds).size).toBe(2);
 });

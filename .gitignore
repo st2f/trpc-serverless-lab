@@ -2,7 +2,7 @@ priv/
 .terraform/
 *.tfstate
 *.tfstate.*
-terraform/ministack-probe/probe.zip
+terraform/ministack/probe.zip
 node_modules/
 dist/
 .vitest/

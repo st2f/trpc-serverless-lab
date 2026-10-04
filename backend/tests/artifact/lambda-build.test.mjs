@@ -38,7 +38,8 @@ async function invokeArtifact(theme) {
   // module transforms and development node_modules cannot mask packaging errors.
   const { stdout } = await runNode(process.execPath, [
     "--input-type=module", "-e",
-    `const { handler } = await import(process.argv[1]);
+    `console.info = (...values) => console.error(...values);
+     const { handler } = await import(process.argv[1]);
      const response = await handler(JSON.parse(process.argv[2]), { awsRequestId: "artifact-test" });
      process.stdout.write(JSON.stringify(response));`,
     moduleUrl,
@@ -50,6 +51,7 @@ async function invokeArtifact(theme) {
 test.each(["day", "night"])("packaged ESM handler returns three distinct %s quotes", async (theme) => {
   const response = await invokeArtifact(theme);
   expect(response.statusCode).toBe(200);
+  expect(response.headers["x-lambda-request-id"]).toBe("artifact-test");
   expect(response.headers["content-type"]).toContain("application/json");
   const body = JSON.parse(response.body);
   expect(body.result.data).toHaveLength(3);
@@ -63,6 +65,7 @@ test.each(["day", "night"])("packaged ESM handler returns three distinct %s quot
 test("packaged ESM handler returns HTTP 400 for an invalid theme", async () => {
   const response = await invokeArtifact("dusk");
   expect(response.statusCode).toBe(400);
+  expect(response.headers["x-lambda-request-id"]).toBe("artifact-test");
   expect(response.headers["content-type"]).toContain("application/json");
   expect(JSON.parse(response.body).error.data).toMatchObject({ code: "BAD_REQUEST", httpStatus: 400 });
 });
